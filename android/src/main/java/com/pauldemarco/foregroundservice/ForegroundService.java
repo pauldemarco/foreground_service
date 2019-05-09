@@ -7,11 +7,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
+import android.os.Build;
+import android.graphics.Color;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import androidx.core.app.NotificationCompat;
 
 public class ForegroundService extends Service {
     private static final String TAG = "ForegroundService";
-    public static int ONGOING_NOTIFICATION_ID = 1;
 
     @Override
     public void onCreate() {
@@ -28,7 +31,44 @@ public class ForegroundService extends Service {
 
             Bundle bundle = intent.getExtras();
 
-            Notification notification =
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
+                int ONGOING_NOTIFICATION_ID = 2;
+
+                String NOTIFICATION_CHANNEL_ID = "com.pauldemarco.foregroundservice";
+                String channelName = "Foreground Service";
+                NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                    channelName, NotificationManager.IMPORTANCE_NONE);
+
+                chan.setLightColor(Color.BLUE);
+                chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+                NotificationManager manager = (NotificationManager) getSystemService(
+                    getApplicationContext().NOTIFICATION_SERVICE);
+                assert manager != null;
+                manager.createNotificationChannel(chan);
+
+                NotificationCompat.Builder notificationBuilder =
+                    new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+
+                Notification notification = notificationBuilder
+                    .setOngoing(true)
+                    // .setSmallIcon(R.drawable.icon_1)
+                    .setContentTitle(bundle.getString("title"))
+                    .setContentText(bundle.getString("text"))
+                    .setSubText(bundle.getString("subText"))
+                    .setTicker(bundle.getString("ticker"))
+                    .setPriority(NotificationManager.IMPORTANCE_MIN)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .build();
+
+                startForeground(ONGOING_NOTIFICATION_ID, notification);
+            }
+            else
+            {
+                int ONGOING_NOTIFICATION_ID = 1;
+
+                Notification notification =
                     new NotificationCompat.Builder(this)
                             .setOngoing(true)
                             .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -39,8 +79,9 @@ public class ForegroundService extends Service {
                             .setSmallIcon(android.R.drawable.ic_dialog_info)
                             .setContentIntent(pendingIntent)
                             .build();
-
-            startForeground(ONGOING_NOTIFICATION_ID, notification);
+                            
+               startForeground(ONGOING_NOTIFICATION_ID, notification);
+            }
 
         } else if (ForegroundServicePlugin.STOPFOREGROUND_ACTION.equals(intent.getAction())) {
             stopForeground(true);

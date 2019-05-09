@@ -7,7 +7,13 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+
+    ext {
+       compileSdkVersion   = 28                // or higher
+       targetSdkVersion    = 28                // or higher
+       supportLibVersion   = "1.0.2"           // or higher
     }
 }
 
