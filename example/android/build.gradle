@@ -14,7 +14,6 @@ buildscript {
        compileSdkVersion   = 28                // or higher
        targetSdkVersion    = 28                // or higher
        supportLibVersion   = "1.0.2"           // or higher
-       playServicesLocationVersion = "16.0.0"  // or higher
     }
 }
 
